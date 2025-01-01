@@ -12,4 +12,4 @@ database:
   driverClass: com.mysql.cj.jdbc.Driver
   user: root
   password: Mudal@p3
-  url: jdbc:mysql://localhost:3306/dropwizard
+  url: jdbc:mysql://localhost:3306/tododb
