@@ -1,5 +1,6 @@
 package com.pratik;
 
+import com.pratik.api.SamplePingResource;
 import io.dropwizard.configuration.ResourceConfigurationSourceProvider;
 import io.dropwizard.core.Application;
 import io.dropwizard.core.setup.Bootstrap;
@@ -15,7 +16,7 @@ public class Main extends Application<AppConfiguration>
 
     @Override
     public void run(AppConfiguration appConfiguration, Environment environment) throws Exception {
-
+        environment.jersey().register(new SamplePingResource());
     }
 
     @Override
