@@ -9,6 +9,7 @@ import jakarta.ws.rs.core.Response;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,6 +107,57 @@ public class TaskResource
                         .build();
             }
 
+        }
+        catch (Exception e)
+        {
+            // Step 8: Handle any exceptions and return HTTP 500
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+        finally
+        {
+            // Step 9: Close all resources (connection, statement, result set)
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                // Log the exception (optional)
+            }
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createATask (Task task)
+    {
+        try
+        {
+            connection = databaseHelper.getConnection();
+            String query = "INSERT INTO tasks (description, start_date, target_date, status) VALUES (?, ?, ?, ?)";
+            statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            statement.setString(1,task.getDescription());
+            statement.setDate(2,new java.sql.Date(task.getStartDate().getTime()));
+            statement.setDate(3,new java.sql.Date(task.getTargetDate().getTime()));
+            statement.setString(4, task.getStatus().name());
+
+            int rowsInserted = statement.executeUpdate();
+
+            if (rowsInserted > 0)
+            {
+                ResultSet generatedKeys = statement.getGeneratedKeys();
+                if (generatedKeys.next())
+                {
+                    int taskId = generatedKeys.getInt(1);
+                    task.setTaskId(taskId);
+                }
+                return Response.status(Response.Status.CREATED).entity(task).build(); // Return the created task
+            }
+            else
+            {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity("Failed to create task.")
+                        .build();
+            }
         }
         catch (Exception e)
         {

@@ -1,6 +1,7 @@
 package com.pratik.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
@@ -10,6 +11,15 @@ public class Task
     {
 
     }
+
+    public Task(String description, Date startDate, Date targetDate, Status status)
+    {
+        this.description = description;
+        this.startDate = startDate;
+        this.targetDate = targetDate;
+        this.status = status;
+    }
+
     private int taskId;
     private String description;
 
