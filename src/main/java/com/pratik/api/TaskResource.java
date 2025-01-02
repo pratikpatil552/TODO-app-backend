@@ -177,6 +177,83 @@ public class TaskResource
         }
     }
 
+    @PATCH
+    @Path("/{taskId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateATask (@PathParam("taskId") int taskId, Task task)
+    {
+        try
+        {
+            connection = databaseHelper.getConnection();
+            StringBuilder query = new StringBuilder("UPDATE tasks SET ");
+            boolean firstField = true;
+
+            if(task.getDescription() != null)
+            {
+                query.append("description = ?");
+                firstField = false;
+            }
+            if(task.getStartDate() != null)
+            {
+                if(!firstField) query.append(", ");
+                query.append("start_date = ?");
+                firstField = false;
+            }
+            if (task.getTargetDate() != null)
+            {
+                if (!firstField) query.append(", ");
+                query.append("target_date = ?");
+                firstField = false;
+            }
+            if (task.getStatus() != null)
+            {
+                if (!firstField) query.append(", ");
+                query.append("status = ?");
+            }
+            query.append(" WHERE task_id = ?");
+            statement = connection.prepareStatement(query.toString());
+            int paramIndex = 1;
+
+            if (task.getDescription() != null) {
+                statement.setString(paramIndex++, task.getDescription());
+            }
+            if (task.getStartDate() != null) {
+                statement.setDate(paramIndex++, new java.sql.Date(task.getStartDate().getTime()));
+            }
+            if (task.getTargetDate() != null) {
+                statement.setDate(paramIndex++, new java.sql.Date(task.getTargetDate().getTime()));
+            }
+            if (task.getStatus() != null) {
+                statement.setString(paramIndex++, task.getStatus().name());
+            }
+            statement.setInt(paramIndex, taskId);
+
+            int rowsUpdated = statement.executeUpdate();
+            if (rowsUpdated > 0) {
+                return Response.ok().entity("Task updated successfully.").build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).entity("Task not found.").build();
+            }
+        }
+        catch (Exception e)
+        {
+            // Step 8: Handle any exceptions and return HTTP 500
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+        finally
+        {
+            // Step 9: Close all resources (connection, statement, result set)
+            try {
+                if (resultSet != null) resultSet.close();
+                if (statement != null) statement.close();
+                if (connection != null) connection.close();
+            } catch (Exception e) {
+                // Log the exception (optional)
+            }
+        }
+    }
+
+
     @DELETE
     @Path("/{taskId}")
     public Response removeATask (@PathParam("taskId") int taskId)
