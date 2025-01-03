@@ -1,15 +1,14 @@
 server:
-  applicationContextPath: /api/v1
   applicationConnectors:
     - type: http
       port: 8080
   adminConnectors:
     - type: http
       port: 8081
-
+  applicationContextPath: /api/v1
 
 database:
   driverClass: com.mysql.cj.jdbc.Driver
   user: root
-  password: Mudal@p3
-  url: jdbc:mysql://localhost:3306/tododb
+  password: password
+  url: jdbc:mysql://mysql:3306/tododb
